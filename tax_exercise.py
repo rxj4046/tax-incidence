@@ -90,7 +90,7 @@ with st.sidebar:
     d = st.number_input("斜率 d (供给对价格的敏感度)", min_value=0.1, max_value=2.0, value=0.6, step=0.1)
     st.divider()
     st.subheader("税收设置")
-    t = st.number_input("从量税 t (单位税额)", min_value=0.0, max_value=100.0, value=30.0, step=2.0)
+    t = st.number_input("从量税 t (单位税额)", min_value=0.0, max_value=50.0, value=10.0, step=2.0)
     tax_on = st.radio("向谁征税？", options=["supplier", "consumer"],
                       format_func=lambda x: "卖方" if x == "supplier" else "买方",
                       index=0, horizontal=True)
@@ -170,22 +170,30 @@ else:
                 arrowprops=dict(arrowstyle='->', color='purple'), fontsize=9)
     ax.axhline(Pc, color='orange', linestyle=':', alpha=0.5, label=f'消费者价格 Pc={Pc:.1f}')
 
+# ---------- 新增：从均衡点向坐标轴绘制垂直和水平虚线 ----------
+# 税前均衡点
+ax.axvline(x=Q0, ymax=P0/ylim_max, linestyle='--', color='green', alpha=0.5, linewidth=1)
+ax.axhline(y=P0, xmax=Q0/xlim_max, linestyle='--', color='green', alpha=0.5, linewidth=1)
+# 税后市场均衡点（根据征税对象选择对应的价格）
+if tax_on == 'supplier':
+    ax.axvline(x=Q1, ymax=Pc/ylim_max, linestyle='--', color='purple', alpha=0.5, linewidth=1)
+    ax.axhline(y=Pc, xmax=Q1/xlim_max, linestyle='--', color='purple', alpha=0.5, linewidth=1)
+else:
+    ax.axvline(x=Q1, ymax=Pp/ylim_max, linestyle='--', color='purple', alpha=0.5, linewidth=1)
+    ax.axhline(y=Pp, xmax=Q1/xlim_max, linestyle='--', color='purple', alpha=0.5, linewidth=1)
+
 # 税收收入矩形
 if t > 0:
     rect = plt.Rectangle((0, Pp), Q1, t, facecolor='gold', alpha=0.2, label='税收收入')
     ax.add_patch(rect)
 
-# ---------- 新增：在轴外侧标注价格和数量的具体数值 ----------
-# 税前数量标注（横轴下方）
+# 在轴外侧标注价格和数量的具体数值
 ax.text(Q0, -0.05, f'{Q0:.1f}', transform=ax.get_xaxis_transform(),
         ha='center', va='top', color='green', fontsize=9)
-# 税前价格标注（纵轴左侧）
 ax.text(-0.05, P0, f'{P0:.1f}', transform=ax.get_yaxis_transform(),
         ha='right', va='center', color='green', fontsize=9)
-# 税后数量标注
 ax.text(Q1, -0.05, f'{Q1:.1f}', transform=ax.get_xaxis_transform(),
         ha='center', va='top', color='purple', fontsize=9)
-# 税后价格标注（根据征税对象标注不同价格）
 if tax_on == 'supplier':
     ax.text(-0.05, Pc, f'{Pc:.1f}', transform=ax.get_yaxis_transform(),
             ha='right', va='center', color='purple', fontsize=9)
