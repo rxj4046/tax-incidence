@@ -90,7 +90,7 @@ with st.sidebar:
     d = st.number_input("斜率 d (供给对价格的敏感度)", min_value=0.1, max_value=2.0, value=0.6, step=0.1)
     st.divider()
     st.subheader("税收设置")
-    t = st.number_input("从量税 t (单位税额)", min_value=0.0, max_value=50.0, value=10.0, step=2.0)
+    t = st.number_input("从量税 t (单位税额)", min_value=0.0, max_value=100.0, value=30.0, step=2.0)
     tax_on = st.radio("向谁征税？", options=["supplier", "consumer"],
                       format_func=lambda x: "卖方" if x == "supplier" else "买方",
                       index=0, horizontal=True)
