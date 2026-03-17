@@ -218,11 +218,15 @@ plt.subplots_adjust(left=0.15, bottom=0.15)
 st.pyplot(fig)
 
 # ---------------------- 结果展示（含总税负，学生填写验证）---------------------
+# ---------------------- 结果展示（学生练习：填写所有关键变量）---------------------
 st.divider()
-st.subheader("📝 学生练习：计算税收相关总金额")
-st.markdown("请根据图表中的信息，填写以下三个数值（保留两位小数），然后点击验证按钮。")
+st.subheader("📝 学生练习：计算税收相关数值")
+st.markdown("请根据图表中的信息，填写以下所有数值（保留两位小数），然后点击验证按钮。")
 
 # 真实计算值（保留两位小数供比较）
+true_Q1 = round(Q1, 2)
+true_tax_consumer = round(tax_consumer, 2)
+true_tax_producer = round(tax_producer, 2)
 true_total_revenue = round(t * Q1, 2)
 true_consumer_total = round(tax_consumer * Q1, 2)
 true_producer_total = round(tax_producer * Q1, 2)
@@ -230,61 +234,89 @@ true_producer_total = round(tax_producer * Q1, 2)
 # 已知条件展示（帮助学生理解）
 col_info1, col_info2, col_info3 = st.columns(3)
 with col_info1:
-    st.info(f"税前价格: {P0:.2f}")
-    st.info(f"税前数量: {Q0:.2f}")
+    st.info(f"税前价格 P0: {P0:.2f}")
+    st.info(f"税前数量 Q0: {Q0:.2f}")
 with col_info2:
     st.info(f"税率 t: {t:.2f}")
-    st.info(f"税后数量: {Q1:.2f}")
+    st.info(f"需求弹性 |Ed|: {Ed_abs:.3f}")
 with col_info3:
-    st.info(f"消费者多付: {tax_consumer:.2f}")
-    st.info(f"生产者少得: {tax_producer:.2f}")
+    st.info(f"供给弹性 Es: {Es:.3f}")
+    st.info(f"征税对象: {'卖方' if tax_on == 'supplier' else '买方'}")
 
 st.markdown("---")
 
-# 学生输入区域
+# 学生输入区域（分两行布局）
 col_input1, col_input2, col_input3 = st.columns(3)
 with col_input1:
+    student_Q1 = st.number_input(
+        "税后数量 Q₁", value=None, placeholder="请输入",
+        step=0.01, format="%.2f", key="Q1_input"
+    )
+with col_input2:
+    student_tax_consumer = st.number_input(
+        "消费者多付 (ΔPc)", value=None, placeholder="请输入",
+        step=0.01, format="%.2f", key="tax_consumer_input"
+    )
+with col_input3:
+    student_tax_producer = st.number_input(
+        "生产者少得 (ΔPp)", value=None, placeholder="请输入",
+        step=0.01, format="%.2f", key="tax_producer_input"
+    )
+
+col_input4, col_input5, col_input6 = st.columns(3)
+with col_input4:
     student_total_revenue = st.number_input(
         "税收总收入", value=None, placeholder="请输入",
         step=0.01, format="%.2f", key="revenue_input"
     )
-with col_input2:
+with col_input5:
     student_consumer_total = st.number_input(
         "消费者总税负", value=None, placeholder="请输入",
-        step=0.01, format="%.2f", key="consumer_input"
+        step=0.01, format="%.2f", key="consumer_total_input"
     )
-with col_input3:
+with col_input6:
     student_producer_total = st.number_input(
         "生产者总税负", value=None, placeholder="请输入",
-        step=0.01, format="%.2f", key="producer_input"
+        step=0.01, format="%.2f", key="producer_total_input"
     )
 
 # 验证按钮
 if st.button("✅ 验证答案", type="primary"):
     # 检查是否全部填写
-    if student_total_revenue is None or student_consumer_total is None or student_producer_total is None:
-        st.warning("请先填写所有三个数值。")
+    inputs = [student_Q1, student_tax_consumer, student_tax_producer,
+              student_total_revenue, student_consumer_total, student_producer_total]
+    if any(v is None for v in inputs):
+        st.warning("请先填写所有六个数值。")
     else:
-        # 判断正确性（允许浮点误差）
-        correct_revenue = abs(student_total_revenue - true_total_revenue) < 0.01
-        correct_consumer = abs(student_consumer_total - true_consumer_total) < 0.01
-        correct_producer = abs(student_producer_total - true_producer_total) < 0.01
+        # 判断每个输入的正确性（允许浮点误差 0.01）
+        correct_Q1 = abs(student_Q1 - true_Q1) < 0.01
+        correct_tax_consumer = abs(student_tax_consumer - true_tax_consumer) < 0.01
+        correct_tax_producer = abs(student_tax_producer - true_tax_producer) < 0.01
+        correct_total_revenue = abs(student_total_revenue - true_total_revenue) < 0.01
+        correct_consumer_total = abs(student_consumer_total - true_consumer_total) < 0.01
+        correct_producer_total = abs(student_producer_total - true_producer_total) < 0.01
 
-        if correct_revenue and correct_consumer and correct_producer:
+        if (correct_Q1 and correct_tax_consumer and correct_tax_producer and
+            correct_total_revenue and correct_consumer_total and correct_producer_total):
             st.success("🎉 完全正确！你的计算结果与系统一致。")
         else:
             st.error("❌ 部分答案不正确，请检查计算。")
-            # 给出具体哪些错误
-            if not correct_revenue:
+            # 列出错误项并给出正确答案
+            if not correct_Q1:
+                st.markdown(f"- 税后数量 Q₁ 错误（正确答案：{true_Q1:.2f}）")
+            if not correct_tax_consumer:
+                st.markdown(f"- 消费者多付 ΔPc 错误（正确答案：{true_tax_consumer:.2f}）")
+            if not correct_tax_producer:
+                st.markdown(f"- 生产者少得 ΔPp 错误（正确答案：{true_tax_producer:.2f}）")
+            if not correct_total_revenue:
                 st.markdown(f"- 税收总收入错误（正确答案：{true_total_revenue:.2f}）")
-            if not correct_consumer:
+            if not correct_consumer_total:
                 st.markdown(f"- 消费者总税负错误（正确答案：{true_consumer_total:.2f}）")
-            if not correct_producer:
+            if not correct_producer_total:
                 st.markdown(f"- 生产者总税负错误（正确答案：{true_producer_total:.2f}）")
 
-# 可选的显示正确答案按钮（方便教学）
-with st.expander("🔍 显示正确答案"):
-    st.markdown(f"""
+# 注意：不再直接显示任何正确答案，只有验证后才会在错误提示中显示。
+# 这样满足“只有学生填了之后才能显示正确答案”的要求。
     - 税收总收入：**{true_total_revenue:.2f}**
     - 消费者总税负：**{true_consumer_total:.2f}**
     - 生产者总税负：**{true_producer_total:.2f}**
