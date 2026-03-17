@@ -288,12 +288,12 @@ if st.button("✅ 验证答案", type="primary"):
         st.warning("请先填写所有六个数值。")
     else:
         # 判断每个输入的正确性（允许浮点误差 0.01）
-        correct_Q1 = abs(student_Q1 - true_Q1) < 0.01
-        correct_tax_consumer = abs(student_tax_consumer - true_tax_consumer) < 0.01
-        correct_tax_producer = abs(student_tax_producer - true_tax_producer) < 0.01
-        correct_total_revenue = abs(student_total_revenue - true_total_revenue) < 0.01
-        correct_consumer_total = abs(student_consumer_total - true_consumer_total) < 0.01
-        correct_producer_total = abs(student_producer_total - true_producer_total) < 0.01
+        correct_Q1 = abs(student_Q1 - true_Q1) < 0.5
+        correct_tax_consumer = abs(student_tax_consumer - true_tax_consumer) < 0.5
+        correct_tax_producer = abs(student_tax_producer - true_tax_producer) < 0.5
+        correct_total_revenue = abs(student_total_revenue - true_total_revenue) < 0.5
+        correct_consumer_total = abs(student_consumer_total - true_consumer_total) < 0.5
+        correct_producer_total = abs(student_producer_total - true_producer_total) < 0.5
 
         if (correct_Q1 and correct_tax_consumer and correct_tax_producer and
             correct_total_revenue and correct_consumer_total and correct_producer_total):
