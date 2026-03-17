@@ -201,37 +201,6 @@ ax.grid(True, alpha=0.3)
 plt.tight_layout()
 st.pyplot(fig)
 
-# ---------------------- 结果展示（仅弹性与实际税额变化）---------------------
-st.divider()
-st.subheader("📊 弹性与税负变化")
-
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.metric("税前均衡价格", f"{P0:.2f}")
-    st.metric("税前均衡数量", f"{Q0:.2f}")
-with col2:
-    st.metric("需求价格弹性 (绝对值)", f"{Ed_abs:.3f}")
-    st.metric("供给价格弹性", f"{Es:.3f}")
-with col3:
-    st.metric("消费者多付 (tax_consumer)", f"{tax_consumer:.2f}")
-    st.metric("生产者少得 (tax_producer)", f"{tax_producer:.2f}")
-
-st.markdown(f"""
-#### 弹性如何影响税负？
-- 消费者价格从 **{P0:.2f}** 变为 **{Pc:.2f}**，上升了 **{tax_consumer:.2f}**  
-- 生产者价格从 **{P0:.2f}** 变为 **{Pp:.2f}**，下降了 **{abs(tax_producer):.2f}**  
-- 数量从 **{Q0:.2f}** 减少到 **{Q1:.2f}**，减少了 **{Q0-Q1:.2f}**
-
-**关键规律**：弹性越大的一方，越能通过调整数量避开税收，因此承担的税负越小。  
-- 当前需求弹性 **{Ed_abs:.3f}**，供给弹性 **{Es:.3f}** →  
-  - 若 **Ed_abs > Es**（需求更富弹性），则生产者承担更多（tax_producer > tax_consumer）  
-  - 若 **Ed_abs < Es**（供给更富弹性），则消费者承担更多（tax_consumer > tax_producer）  
-  - 若两者相等，则税负平均分担
-
-您可以调整左侧的斜率参数（b 和 d）改变弹性，观察 **tax_consumer** 与 **tax_producer** 如何变化。
-""")
-# ...（前面的代码保持不变，包括参数输入、均衡计算、绘图等）
-
 # ---------------------- 结果展示（增加总税负）---------------------
 st.divider()
 st.subheader("📊 弹性与税负变化（含总税负）")
