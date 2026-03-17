@@ -116,7 +116,7 @@ with st.sidebar:
 
     st.divider()
     st.subheader("税收设置")
-    t = st.number_input("从量税 t (单位税额)", min_value=0.0, max_value=50.0, value=10.0, step=2.0,
+    t = st.number_input("从量税 t (单位税额)", min_value=0.0, max_value=100.0, value=30.0, step=2.0,
                         help="每单位商品征收的税额")
     tax_on = st.radio("向谁征税？", options=["supplier", "consumer"],
                       format_func=lambda x: "卖方" if x == "supplier" else "买方",
@@ -140,7 +140,7 @@ Ed_abs, Es = calculate_elasticities(a, b, c, d, P0, Q0)
 tax_consumer = Pc - P0   # 消费者多付的部分
 tax_producer = P0 - Pp   # 生产者少得的部分
 
-# ---------------------- 绘图 ----------------------
+
 # ---------------------- 核心绘图逻辑 ----------------------
 fig, ax = plt.subplots(figsize=(10, 6))
 price_range = np.linspace(0, 200, 500)
