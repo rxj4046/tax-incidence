@@ -230,3 +230,47 @@ st.markdown(f"""
 
 您可以调整左侧的斜率参数（b 和 d）改变弹性，观察 **tax_consumer** 与 **tax_producer** 如何变化。
 """)
+# ...（前面的代码保持不变，包括参数输入、均衡计算、绘图等）
+
+# ---------------------- 结果展示（增加总税负）---------------------
+st.divider()
+st.subheader("📊 弹性与税负变化（含总税负）")
+
+# 计算总税负
+total_tax_revenue = t * Q1          # 税收总收入
+consumer_total_tax = tax_consumer * Q1   # 消费者总税负
+producer_total_tax = tax_producer * Q1   # 生产者总税负
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.metric("税前均衡价格", f"{P0:.2f}")
+    st.metric("税前均衡数量", f"{Q0:.2f}")
+with col2:
+    st.metric("需求价格弹性 (绝对值)", f"{Ed_abs:.3f}")
+    st.metric("供给价格弹性", f"{Es:.3f}")
+with col3:
+    st.metric("消费者多付 (单位)", f"{tax_consumer:.2f}")
+    st.metric("生产者少得 (单位)", f"{tax_producer:.2f}")
+
+# 第二行：总税负相关指标
+col4, col5, col6 = st.columns(3)
+with col4:
+    st.metric("税收总收入", f"{total_tax_revenue:.2f}")
+with col5:
+    st.metric("消费者总税负", f"{consumer_total_tax:.2f}")
+with col6:
+    st.metric("生产者总税负", f"{producer_total_tax:.2f}")
+
+st.markdown(f"""
+#### 弹性如何影响税负？
+- 消费者价格从 **{P0:.2f}** 变为 **{Pc:.2f}**，上升了 **{tax_consumer:.2f}**（每单位）
+- 生产者价格从 **{P0:.2f}** 变为 **{Pp:.2f}**，下降了 **{abs(tax_producer):.2f}**（每单位）
+- 数量从 **{Q0:.2f}** 减少到 **{Q1:.2f}**，减少了 **{Q0-Q1:.2f}**
+
+**总税负含义**：
+- 税收总收入 = 税率 × 税后数量 = {t:.2f} × {Q1:.2f} = **{total_tax_revenue:.2f}**
+- 消费者总税负 = 消费者单位多付 × 税后数量 = {tax_consumer:.2f} × {Q1:.2f} = **{consumer_total_tax:.2f}**
+- 生产者总税负 = 生产者单位少得 × 税后数量 = {tax_producer:.2f} × {Q1:.2f} = **{producer_total_tax:.2f}**
+
+**规律**：弹性越大的一方，单位税负越小，但总税负还取决于税后数量。您可以通过调整斜率参数（b 和 d）观察弹性变化如何同时影响单位税负和总税负。
+""")
