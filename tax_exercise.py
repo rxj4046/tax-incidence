@@ -141,6 +141,7 @@ tax_consumer = Pc - P0   # 消费者多付的部分
 tax_producer = P0 - Pp   # 生产者少得的部分
 
 # ---------------------- 绘图 ----------------------
+# ---------------------- 核心绘图逻辑 ----------------------
 fig, ax = plt.subplots(figsize=(10, 6))
 price_range = np.linspace(0, 200, 500)
 
@@ -158,30 +159,65 @@ if tax_on == 'supplier':
     Qs_tax = supply_curve(price_range - t, c, d)
     Qs_tax = np.where((price_range >= t) & (Qs_tax >= 0), Qs_tax, np.nan)
     ax.plot(Qs_tax, price_range, 'b--', label='供给曲线 (税后)', linewidth=2, alpha=0.7)
-    Qd_tax = Qd_pre
 else:
     Qd_tax = demand_curve(price_range + t, a, b)
     Qd_tax = np.where(Qd_tax >= 0, Qd_tax, np.nan)
     ax.plot(Qd_tax, price_range, 'r--', label='需求曲线 (税后)', linewidth=2, alpha=0.7)
-    Qs_tax = Qs_pre
+
+# 设置坐标轴范围（提前到标注之前，以便计算动态偏移）
+xlim_max = max(Q0, Q1) * 1.5
+ylim_max = max(P0, Pc, Pp) * 1.5
+ax.set_xlim(0, xlim_max)
+ax.set_ylim(0, ylim_max)
+
+# 计算动态偏移量（基于坐标轴范围的5%）
+x_offset = xlim_max * 0.05
+y_offset = ylim_max * 0.05
 
 # 标注税前均衡点
 ax.scatter(Q0, P0, s=100, color='green', zorder=5, label='税前均衡')
+# 根据税后价格与税前价格的关系决定标注的垂直方向
+if tax_on == 'supplier':
+    if Pc > P0:
+        xytext_pre = (Q0 + x_offset, P0 - y_offset)
+    else:
+        xytext_pre = (Q0 + x_offset, P0 + y_offset)
+else:
+    if Pp > P0:
+        xytext_pre = (Q0 + x_offset, P0 - y_offset)
+    else:
+        xytext_pre = (Q0 + x_offset, P0 + y_offset)
+
 ax.annotate(f'税前\nP={P0:.1f}\nQ={Q0:.1f}',
-            (Q0, P0), xytext=(Q0+5, P0+10),
+            (Q0, P0), xytext=xytext_pre,
             arrowprops=dict(arrowstyle='->', color='green'), fontsize=9)
 
 # 标注税后均衡点
 if tax_on == 'supplier':
     ax.scatter(Q1, Pc, s=100, color='purple', zorder=5, label='税后市场价')
+    # 如果与税前点太近，将税后标注放在相反方向
+    if abs(Pc - P0) < y_offset and abs(Q1 - Q0) < x_offset:
+        if Pc > P0:
+            xytext_post = (Q1 - x_offset, Pc + y_offset)
+        else:
+            xytext_post = (Q1 - x_offset, Pc - y_offset)
+    else:
+        xytext_post = (Q1 + x_offset, Pc + y_offset)
     ax.annotate(f'税后市场价\nPc={Pc:.1f}\nQ={Q1:.1f}',
-                (Q1, Pc), xytext=(Q1+5, Pc+10),
+                (Q1, Pc), xytext=xytext_post,
                 arrowprops=dict(arrowstyle='->', color='purple'), fontsize=9)
     ax.axhline(Pp, color='gray', linestyle=':', alpha=0.5, label=f'生产者价格 Pp={Pp:.1f}')
 else:
     ax.scatter(Q1, Pp, s=100, color='purple', zorder=5, label='税后生产者价')
+    if abs(Pp - P0) < y_offset and abs(Q1 - Q0) < x_offset:
+        if Pp > P0:
+            xytext_post = (Q1 - x_offset, Pp + y_offset)
+        else:
+            xytext_post = (Q1 - x_offset, Pp - y_offset)
+    else:
+        xytext_post = (Q1 + x_offset, Pp + y_offset)
     ax.annotate(f'税后生产者价\nPp={Pp:.1f}\nQ={Q1:.1f}',
-                (Q1, Pp), xytext=(Q1+5, Pp+10),
+                (Q1, Pp), xytext=xytext_post,
                 arrowprops=dict(arrowstyle='->', color='purple'), fontsize=9)
     ax.axhline(Pc, color='orange', linestyle=':', alpha=0.5, label=f'消费者价格 Pc={Pc:.1f}')
 
@@ -190,8 +226,6 @@ if t > 0:
     rect = plt.Rectangle((0, Pp), Q1, t, facecolor='gold', alpha=0.2, label='税收收入')
     ax.add_patch(rect)
 
-ax.set_xlim(0, max(Q0, Q1)*1.5)
-ax.set_ylim(0, max(P0, Pc, Pp)*1.5)
 ax.set_xlabel('Quantity (Q) 数量')
 ax.set_ylabel('Price (P) 价格')
 ax.set_title('从量税：消费者与生产者承担的价格变化')
