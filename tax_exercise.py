@@ -76,7 +76,7 @@ def calculate_elasticities(a, b, c, d, P0, Q0):
 
 # ---------------------- Streamlit 界面 ----------------------
 st.set_page_config(page_title="税收效应分析（弹性与税负）", layout="wide")
-st.title("💰 税收效应分析：弹性如何决定税负分配")
+st.title("💰 税收效应分析")
 st.markdown("### 调整参数，观察需求弹性和供给弹性如何影响消费者与生产者承担的价格变化")
 
 with st.sidebar:
